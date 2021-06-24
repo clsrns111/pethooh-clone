@@ -1,0 +1,71 @@
+import axios from "axios";
+import React, { useHistory, useEffect, useState } from "react";
+import { BrowserRouter as Router, Link } from "react-router-dom";
+import { IoIosArrowForward } from "react-icons/io";
+function CatFood() {
+  const [product, setproduct] = useState([]);
+
+  useEffect(() => {
+    axios.post("/api/product/catfood").then((res) => {
+      console.log(res);
+      let newdata = [];
+      if (res.data.product) {
+        for (let i = 0; i < res.data.product.length; i++) {
+          const { price } = res.data.product[i];
+          let b = price.split("");
+          b.splice(-3, 0, ",");
+          const newprice = b.join("");
+
+          newdata.push({ ...res.data.product[i], price: newprice });
+        }
+      }
+
+      setproduct(newdata);
+    });
+  }, [product]);
+
+  if (product.length <= 0) {
+    return (
+      <h1
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        Loading...
+      </h1>
+    );
+  }
+
+  return (
+    <section className="product-section">
+      <small className="home-product">
+        <Link to="/">Home</Link> <IoIosArrowForward />{" "}
+        <Link to="/category/catfood">CatFood</Link>
+      </small>
+      <h4 className="idx">Cat Food</h4>
+      {product.map((el, idx) => {
+        return (
+          <div onClick={() => {}} className="product" key={idx}>
+            <div className="img-container">
+              <Link to={`/detail/${el._id}`}>
+                <img
+                  className="product-img"
+                  src={`http://localhost:5000/${el.img}`}
+                ></img>
+              </Link>
+              <div className="under"></div>
+              <div className="product-sub">
+                <p className="product-title">{el.product}</p>
+                <p className="product-price">{el.price}원</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
+export default CatFood;
